@@ -1,0 +1,119 @@
+#!/bin/bash
+#set -x  # echo on
+################
+#
+# Setting slurm options
+#
+################
+    
+# lines starting with "#SBATCH" define your jobs parameters
+
+# telling slurm where to write output and error
+##SBATCH --chdir <some dir>
+#SBATCH --output $out_path_sbatch
+#SBATCH --error $out_path_sbatch
+
+# requesting the type of node on which to run job
+#SBATCH --partition $partition
+    
+# telling slurm how many instances of this job to spawn (typically 1)
+#SBATCH --ntasks $ntasks
+    
+# setting number of CPUs per task (1 for serial jobs)
+#SBATCH --cpus-per-task $cpus_per_task
+    
+# setting memory requirements
+#SBATCH --mem-per-cpu $mem_per_cpu
+    
+# propagating max time for job to run
+##SBATCH --time <days-hours:minute:seconds>
+##SBATCH --time <hours:minute:seconds>
+#SBATCH --time $time
+    
+# Setting the name for the job
+#SBATCH --job-name "$job_name"
+    
+# setting notifications for job
+# accepted values are ALL, BEGIN, END, FAIL, REQUEUE
+#SBATCH --mail-type FAIL,END,REQUEUE
+
+# declare variables:
+data_dir_source=$data_dir_source
+data_dir=$data_dir
+data_dir_default=$data_dir_default
+job_dir=$job_dir
+out_path=$out_path
+
+binpath=$binpath
+binname=$binname
+arguments="$arguments"
+stdin=n
+
+################
+#
+# copying your data to /scratch
+#
+################
+
+# create destination directory
+mkdir -p $$job_dir
+cp $$0 $$job_dir  # copy this script to job output directory
+
+# create local folder on ComputeNode
+scratch=/scratch/$$USER/$$SLURM_JOB_ID
+mkdir -p $$scratch/{data,bin}
+    
+# copy all your NEEDED data to ComputeNode
+cp -p $$data_dir_source/{,.}* $$scratch/data  # copy source data
+cp -a $$binpath $$scratch/bin  # copy program
+cp $$0 $$scratch  # copy job script 
+cd $$scratch/data  # go to copied data on scratch
+    
+# dont access /home after this line
+    
+# if needed load modules here
+module load mkl
+    
+# if needed add export variables here
+
+################
+#
+# run the program
+#
+################
+#pwd
+#ls
+#ls $$scratch
+#ls $$scratch/data
+#ls $$scratch/bin
+
+#wien2k is written by shitty programmers
+if [ "$w2k_princess" != "" ]; then
+    echo "Wien2k special procedure" 
+    mv $$scratch/{data,$w2k_princess}
+    ln -s $$scratch/{$w2k_princess,data}
+    cd $$scratch/$w2k_princess
+    export SCRATCH=./
+    #export OMP_NUM_THREADS=1
+    echo "w2k: $$(pwd)"
+    echo "$$WIENROOT"
+fi
+
+
+echo $$stdin | $$scratch/bin/$$binname $$arguments | tee out
+    
+# copy results to data directory
+mkdir -p $$data_dir
+cp -a $$scratch/data/. $$data_dir
+
+if [ "$$data_dir" != "$$data_dir_default" ]; then
+    ln -s $$data_dir $$data_dir_default  # create link if custom data_dir is supplied
+fi
+
+mv $$out_path $$job_dir/slurm.out
+
+# clean up scratch
+rm -rf $$scratch
+unset scratch
+    
+exit 0
