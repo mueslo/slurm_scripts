@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 import os
 import argparse
 from datetime import timedelta
@@ -13,12 +13,16 @@ parser.add_argument('--name', metavar='NAME', help='Job name', default='Wien2K c
 parser.add_argument('--time', metavar='TIME', help='Requested time in hours', type=float, default=48)
 parser.add_argument('--args', metavar='ARGS', help='run_lapw arguments', type=str, default="-p")
 parser.add_argument('--debug', action='store_true', help='use debug pool')
+parser.add_argument('--ncpus', metavar='NCPUS', help='requested # cpus', type=int, default=4)
+parser.add_argument('--mempercpu', metavar='MEM', help='requested mem per cpu in MB', type=int, default=1024)
+parser.add_argument('--binname', metavar='BINNAME', choices=['run_lapw', 'run_bandplothf_lapw', 'x'], default='run_lapw')
 
 if __name__ == '__main__':
     # todo: command line arguments
     args = parser.parse_args()
     d = os.path.abspath(args.directory)
     assert os.path.isdir(d)
+    assert os.path.isfile(d + '/.machines')
 
     requested_time = timedelta(hours=args.time)
     kwargs = {}
@@ -33,9 +37,9 @@ if __name__ == '__main__':
         w2k_princess=os.path.basename(d),
 	arguments=args.args,
         binpath=wien2k_path,
-	binname="wien2k_19.1/run_lapw",
+	binname=os.path.basename(wien2k_path) + '/' + args.binname,
         time=requested_time,
 	debug=args.debug,
-        cpus_per_task=6,
-        mem_per_cpu=1024,
+        cpus_per_task=args.ncpus,
+        mem_per_cpu=args.mempercpu,
         **kwargs)

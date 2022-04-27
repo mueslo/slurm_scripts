@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 import os
 import argparse
 from shutil import copy
@@ -9,6 +9,8 @@ import subprocess
 
 parser = argparse.ArgumentParser(description='Create and queue bandplot calculation.')
 parser.add_argument('directory', metavar='DIR', help='FPLO run directory', nargs='*')
+parser.add_argument('--time', metavar='TIME', help='Requested time in hours', type=float, default=1)
+parser.add_argument('--weights', help='Get bandweights', action='store_true')
 
 if __name__ == '__main__':
 	args = parser.parse_args()
@@ -27,9 +29,9 @@ if __name__ == '__main__':
 		os.chdir(subdir)
 		fed = fedit.Fedit()
 
-		fed.bandplot(active=True)
+		fed.bandplot(active=True, weights=args.weights)
 		fed.pipeFedit()
 
 		print('Created', subdir)
-		output = subprocess.check_output(["queue_fplo.py", '.', "--name", "band_"+os.path.basename(d), "--time", "1"])
+		output = subprocess.check_output(["queue_fplo.py", '.', "--name", "band_"+os.path.basename(d), "--time", str(args.time)])
 		print(output)

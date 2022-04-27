@@ -94,6 +94,7 @@ if [ "$w2k_princess" != "" ]; then
     ln -s $$scratch/{$w2k_princess,data}
     cd $$scratch/$w2k_princess
     export SCRATCH=./
+    export USE_REMOTE=0
     #export OMP_NUM_THREADS=1
     echo "w2k: $$(pwd)"
     echo "$$WIENROOT"
