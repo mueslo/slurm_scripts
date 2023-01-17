@@ -64,7 +64,11 @@ scratch=/scratch/$$USER/$$SLURM_JOB_ID
 mkdir -p $$scratch/{data,bin}
     
 # copy all your NEEDED data to ComputeNode
-cp -p $$data_dir_source/{,.}* $$scratch/data  # copy source data
+if [ -d $$data_dir_source ] ; then
+  cp -p $$data_dir_source/{,.}* $$scratch/data  # copy source data
+elif [ -f $$data_dir_source ]; then
+  cp $$data_dir_source $$scratch/data
+fi
 cp -a $$binpath $$scratch/bin  # copy program
 cp $$0 $$scratch  # copy job script 
 cd $$scratch/data  # go to copied data on scratch
@@ -104,11 +108,15 @@ fi
 echo $$stdin | $$scratch/bin/$$binname $$arguments | tee out
     
 # copy results to data directory
-mkdir -p $$data_dir
-cp -a $$scratch/data/. $$data_dir
+if [ ! -f $$data_dir ] ; then
+  mkdir -p $$data_dir
+  cp -a $$scratch/data/. $$data_dir
 
-if [ "$$data_dir" != "$$data_dir_default" ]; then
+  if [ "$$data_dir" != "$$data_dir_default" ]; then
     ln -s $$data_dir $$data_dir_default  # create link if custom data_dir is supplied
+  fi
+elif [ -f $$data_dir ] ; then
+  cp -a $$scratch/data/. $$data_dir/..
 fi
 
 mv $$out_path $$job_dir/slurm.out
