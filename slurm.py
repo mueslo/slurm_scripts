@@ -16,7 +16,7 @@ template_path = os.path.join(share_dir, "slurm_job.sh.template")
 template = Template(open(template_path, 'r').read())
 
 
-def make_job_file(**kwargs):
+def make_job_file(verbosity=2, **kwargs):
     #mangle kwargs
     assert os.path.exists(kwargs['data_dir_source'])
     assert os.path.exists(kwargs['binpath'])
@@ -61,26 +61,27 @@ def make_job_file(**kwargs):
     kwargs['time'] = str(kwargs['time']).replace(' days, ', '-')
     filled = template.substitute(**kwargs)
     jobfile.write(filled)
-    print(filled)
+    if verbosity >= 2:
+        print(filled)
     return jobfile.name
 
 
-def run_command(*command):
+def run_command(*command, verbosity=2):
     process = subprocess.Popen(command, stdout=subprocess.PIPE)
     while True:
         output = process.stdout.readline()
         if not output and process.poll() is not None:
             break
-        if output:
+        if output and verbosity >= 1:
             print(output.strip())
     rc = process.poll()
     return rc
 
 
-def queue_job(**kwargs):
-    job_file = make_job_file(**kwargs)
+def queue_job(verbosity=2, **kwargs):
+    job_file = make_job_file(**kwargs, verbosity=verbosity)
     print('Temporary job file: {}'.format(job_file))
-    rc = run_command("sbatch", job_file)
+    rc = run_command("sbatch", job_file, verbosity=verbosity)
     
     
 if __name__ == '__main__':
