@@ -39,7 +39,10 @@ def make_job_file(verbosity=2, **kwargs):
     
     kwargs['data_dir_default'] = data_dir_default
     kwargs.setdefault('data_dir', data_dir_default)
-   
+    
+    kwargs.setdefault('env', dict())
+    kwargs['env'] = "\n".join(f"export {k}={v}" for k,v in kwargs['env'].items())
+ 
     kwargs.setdefault('w2k_princess', '')
  
     if 'partition' not in kwargs:

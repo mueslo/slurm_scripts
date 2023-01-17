@@ -34,6 +34,9 @@ if __name__ == '__main__':
         job_name=args.name,
         data_dir_source=d,
         data_dir=d,
+        env={'OMP_NUM_THREADS': 4,
+             'SCRATCH': './',
+             'USE_REMOTE': 0},
         w2k_princess=os.path.basename(d),
 	arguments=args.args,
         binpath=wien2k_path,
@@ -42,4 +45,5 @@ if __name__ == '__main__':
 	debug=args.debug,
         cpus_per_task=args.ncpus,
         mem_per_cpu=args.mempercpu,
+        verbosity=1,
         **kwargs)
