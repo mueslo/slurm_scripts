@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+import os
+import glob
+import argparse
+from shutil import copy
+
+parser = argparse.ArgumentParser(description='Create new FPLO run based on current working directory run.')
+parser.add_argument('dir', metavar='DIR', help='new FPLO run directory', nargs='+')
+args = parser.parse_args()
+
+#cwd = os.getcwd()
+
+for d in args.dir:
+    os.mkdir(d)
+    for fname in glob.glob('./=.*'):
+        copy(fname, d)

@@ -26,4 +26,6 @@ if __name__ == '__main__':
             arguments=os.path.basename(p),
             time=timedelta(hours=args.time),
             cpus_per_task=2,
-            mem_per_cpu=8192)
+            mem_per_cpu=8192,
+            verbosity=1)
+
