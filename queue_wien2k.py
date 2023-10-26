@@ -5,9 +5,12 @@ from datetime import timedelta
 
 from slurm import queue_job
 
-wien2k_path = os.environ['HOME'] + "/tmp/wien2k_19.1"
+wien2k_path = os.environ['WIENROOT']
 
-parser = argparse.ArgumentParser(description='Queue Wien2K run.')
+parser = argparse.ArgumentParser(
+    description='Queue Wien2K run.',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
 parser.add_argument('directory', metavar='DIR', help='Wien2K run directory')
 parser.add_argument('--name', metavar='NAME', help='Job name', default='Wien2K calc')
 parser.add_argument('--time', metavar='TIME', help='Requested time in hours', type=float, default=48)
@@ -18,7 +21,6 @@ parser.add_argument('--mempercpu', metavar='MEM', help='requested mem per cpu in
 parser.add_argument('--binname', metavar='BINNAME', choices=['run_lapw', 'run_bandplothf_lapw', 'x'], default='run_lapw')
 
 if __name__ == '__main__':
-    # todo: command line arguments
     args = parser.parse_args()
     d = os.path.abspath(args.directory)
     assert os.path.isdir(d)
@@ -38,11 +40,11 @@ if __name__ == '__main__':
              'SCRATCH': './',
              'USE_REMOTE': 0},
         w2k_princess=os.path.basename(d),
-	arguments=args.args,
+        arguments=args.args,
         binpath=wien2k_path,
-	binname=os.path.basename(wien2k_path) + '/' + args.binname,
+        binname=os.path.basename(wien2k_path) + '/' + args.binname,
         time=requested_time,
-	debug=args.debug,
+        debug=args.debug,
         cpus_per_task=args.ncpus,
         mem_per_cpu=args.mempercpu,
         verbosity=1,

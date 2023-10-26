@@ -7,12 +7,16 @@ from slurm import queue_job
 
 quanty_path = os.environ['HOME'] + "/bin/Quanty"
 
-parser = argparse.ArgumentParser(description='Queue Quanty calc(s).')
+parser = argparse.ArgumentParser(
+    description='Queue Quanty calc(s).',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
 parser.add_argument('path', metavar='DIR', help='Quanty lua script', nargs='+')
 parser.add_argument('--name', metavar='NAME', help='Job name', default='Quanty calc')
 parser.add_argument('--time', metavar='TIME', help='Requested time in hours', type=float, default=2)
 parser.add_argument('--ncpus', metavar='NCPUS', help='requested # cpus', type=int, default=4)
 parser.add_argument('--mempercpu', metavar='MEM', help='requested mem per cpu in MB', type=int, default=2048)
+parser.add_argument('--debug', action='store_true', help='use debug pool')
 
 if __name__ == '__main__':
     # todo: command line arguments
@@ -28,6 +32,7 @@ if __name__ == '__main__':
             binpath=quanty_path,
             arguments=os.path.basename(p),
             time=timedelta(hours=args.time),
+            debug=args.debug,
             cpus_per_task=args.ncpus,
             mem_per_cpu=args.mempercpu,
             verbosity=1)

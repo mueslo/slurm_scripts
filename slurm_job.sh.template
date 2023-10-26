@@ -105,6 +105,9 @@ fi
 # set environment variables
 $env
 
+# todo https://stackoverflow.com/a/25548995: set output & error buffer to  (optional, default off)
+# todo https:// timeout -k (optional, default off)
+
 echo $$stdin | $$scratch/bin/$$binname $$arguments | tee out
     
 # copy results to data directory

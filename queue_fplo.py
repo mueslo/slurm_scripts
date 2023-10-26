@@ -5,7 +5,6 @@ from datetime import timedelta
 
 from slurm import queue_job
 
-#fplo_path = os.environ['HOME'] + "/tmp/FPLO/bin/fplo18.00-52-x86_64"
 fplo_path = "/usr/local/fplo/21.00-61/FPLO/bin/fplo21.00-61-x86_64"
 
 parser = argparse.ArgumentParser(
@@ -28,7 +27,7 @@ if __name__ == '__main__':
             job_name=job_name,
             data_dir_source=d,
             data_dir=d,
-            binpath=fplo_path, 
+            binpath=fplo_path,
             time=timedelta(hours=args.time),
             cpus_per_task=2,
             mem_per_cpu=8192,
