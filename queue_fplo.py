@@ -14,6 +14,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('directory', metavar='DIR', help='FPLO run directory', nargs='*')
 parser.add_argument('--name', metavar='NAME', help='Job name')
 parser.add_argument('--time', metavar='TIME', help='Requested time in hours', type=float, default=2)
+parser.add_argument('--mem', metavar='MEM', help='Requested memory in MiB', type=int, default=8192)
 
 if __name__ == '__main__':
     # todo: command line arguments
@@ -30,5 +31,5 @@ if __name__ == '__main__':
             binpath=fplo_path,
             time=timedelta(hours=args.time),
             cpus_per_task=2,
-            mem_per_cpu=8192,
+            mem_per_cpu=args.mem,
             verbosity=1)
